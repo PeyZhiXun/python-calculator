@@ -39,4 +39,3 @@ def power(a, b):
         print(f"[DEBUG] power({a}, {b}) = {result}")
     return result
 
-
