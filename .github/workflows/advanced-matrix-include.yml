@@ -1,0 +1,46 @@
+name: Advanced Matrix (Include & Exclude)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.11', '3.12']
+
+        # Exclude specific combinations
+        exclude:
+          - os: macos-latest
+            python-version: '3.9'
+
+        # Additional custom combinations
+        include:
+          - os: ubuntu-latest
+            python-version: '3.13-dev'
+            experimental: true
+
+    # Allow experimental builds to fail without failing the workflow
+    continue-on-error: ${{ matrix.experimental == true }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest -v
